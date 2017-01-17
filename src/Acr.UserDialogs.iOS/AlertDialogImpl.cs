@@ -23,17 +23,17 @@ namespace Acr.UserDialogs
             var style = this.Actions.Any() ? UIAlertControllerStyle.ActionSheet : UIAlertControllerStyle.Alert;
             this.alert = UIAlertController.Create(this.Title, this.Message, style);
 
-            foreach (var action in this.Actions.OfType<DialogAction>())
+            foreach (var action in this.Actions)
             {
-                this.alert.AddAction(action.Create());
+                //this.alert.AddAction(action.Create());
             }
-            foreach (var txt in this.TextEntries.OfType<TextEntry>())
+            foreach (var txt in this.TextEntries)
             {
-                this.alert.AddTextField(x => txt.Hook(x));
+                //this.alert.AddTextField(x => txt.Hook(x));
             }
-            this.AddNativeMainAction(this.alert, this.Positive);
-            this.AddNativeMainAction(this.alert, this.Negative);
-            this.AddNativeMainAction(this.alert, this.Neutral);
+            //this.AddNativeMainAction(this.alert, this.Positive);
+            //this.AddNativeMainAction(this.alert, this.Negative);
+            //this.AddNativeMainAction(this.alert, this.Neutral);
             //var vc = this.viewControllerFunc();
         }
 
@@ -44,25 +44,32 @@ namespace Acr.UserDialogs
         }
 
 
-        public Action Dismissed { get; set; }
-        public IAlertDialog SetMainAction(DialogChoice choice, Action<DialogAction> action)
+        protected virtual void Hook(UITextView tb, TextEntry txt)
         {
-            var obj = new DialogAction { Choice = choice };
-            action(obj);
-            switch (choice)
+            txt.PropertyChanged += (sender, args) =>
             {
-                case DialogChoice.Positive:
-                    this.Positive = obj;
-                    break;
 
-                case DialogChoice.Negative:
-                    this.Negative = obj;
-                    break;
+            };
+        }
 
-                case DialogChoice.Neutral:
-                    this.Neutral = obj;
-                    break;
-            }
+        protected virtual IAlertDialog SetMainAction(DialogChoice choice, Action<DialogAction> action)
+        {
+            //var obj = new DialogAction { Choice = choice };
+            //action(obj);
+            //switch (choice)
+            //{
+            //    case DialogChoice.Positive:
+            //        this.Positive = obj;
+            //        break;
+
+            //    case DialogChoice.Negative:
+            //        this.Negative = obj;
+            //        break;
+
+            //    case DialogChoice.Neutral:
+            //        this.Neutral = obj;
+            //        break;
+            //}
             return this;
         }
 
