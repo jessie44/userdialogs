@@ -125,6 +125,24 @@ namespace Acr.UserDialogs
                 Path = new PropertyPath(txt.Text),
                 Mode = BindingMode.TwoWay
             });
+            /*
+             * TODO: when Text actually changes back, I should be running original code potentially
+             *
+    txt.TextChanged += (sender, e) =>
+    {
+        args.IsValid = true; // reset
+        args.Value = txt.Text;
+        config.OnTextChanged(args);
+        dialog.IsPrimaryButtonEnabled = args.IsValid;
+
+        if (!args.Value.Equals(txt.Text))
+        {
+            txt.Text = args.Value;
+            txt.SelectionStart = Math.Max(0, txt.Text.Length);
+            txt.SelectionLength = 0;
+        }
+    };
+             */
             panel.Children.Add(tb);
         }
     }
