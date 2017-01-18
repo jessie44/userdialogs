@@ -22,7 +22,6 @@ namespace Acr.UserDialogs
                 stop = false;
             };
 
-            // TODO: trigger all
             entry.PropertyChanged += (sender, args) =>
             {
                 if (stop && args.PropertyName.Equals(nameof(entry.Text)))
@@ -57,6 +56,10 @@ namespace Acr.UserDialogs
                     case nameof(entry.TextColor):
                         // TODO: null
                         txt.SetTextColor(entry.TextColor.Value.ToNative());
+                        break;
+
+                    case nameof(entry.IsEnabled):
+                        txt.Focusable = entry.IsEnabled;
                         break;
                 }
                 txt.Text = entry.Text;

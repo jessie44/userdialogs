@@ -81,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppCompat\AcrDialogFragment.cs" />
-    <Compile Include="AppCompat\AppCompatToast.cs" />
+    <Compile Include="AppCompat\AppCompatSnackbar.cs" />
     <Compile Include="Classic\ClassicToast.cs" />
     <Compile Include="EditTextBuilder.cs" />
     <Compile Include="IEditTextBuilder.cs" />

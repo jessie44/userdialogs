@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq;
 using Android.App;
+using Android.Content;
 using Android.OS;
-
-//using Acr.UserDialogs.Fragments;
-//using Acr.UserDialogs.Internals;
-//using Android.App;
-//using Android.Support.V7.App;
-//using AlertDialog = Android.Support.V7.App.AlertDialog;
+using Android.Support.V7.App;
+using Android.Views;
+using Android.Widget;
+using AlertDialog = Android.Support.V7.App.AlertDialog;
 
 
 namespace Acr.UserDialogs.AppCompat
 {
-    public class AppCompatAlertDialog : DialogFragment, IAlertDialog
+    public class AppCompatAlertDialog : AppCompatDialogFragment, IAlertDialog
     {
         public const string FragmentTag = "acr";
 
-        readonly Activity activity;
+        readonly AppCompatActivity activity;
         readonly IEditTextBuilder editTextBuilder;
         readonly IList<TextEntry> textEntries;
         readonly IList<DialogAction> actions;
@@ -26,7 +27,7 @@ namespace Acr.UserDialogs.AppCompat
         AlertDialog dialog;
 
 
-        public AppCompatAlertDialog(Activity activity, IEditTextBuilder editTextBuilder)
+        public AppCompatAlertDialog(AppCompatActivity activity, IEditTextBuilder editTextBuilder)
         {
             this.activity = activity;
             this.editTextBuilder = editTextBuilder;
@@ -42,19 +43,26 @@ namespace Acr.UserDialogs.AppCompat
         public override Dialog OnCreateDialog(Bundle bundle)
         {
             return base.OnCreateDialog(bundle);
+            // TODO: state restore?
         }
 
 
         public override void OnDetach()
         {
             base.OnDetach();
+            // TODO: state grab
         }
 
 
-        //public override void Dismiss()
-        //{
-        //     this.Activity.RunOnUiThread(frag.Dismiss);
-        //}
+        public override void Dismiss()
+        {
+            // TODO: I have to call the fragment's dismiss, not the alertdialog here that is wrapping it
+            //this.Activity.RunOnUiThread(this.Dismiss);
+        }
+
+
+        public Color? BackgroundColor { get; set; }
+        public Color? MessageTextColor { get; set; }
 
         public string Message { get; set; }
         public string Title { get; set; }
@@ -68,224 +76,114 @@ namespace Acr.UserDialogs.AppCompat
 
         public IAlertDialog Add(TextEntry instance)
         {
-            var editText = this.editTextBuilder.Create(this.activity, instance);
+            this.textEntries.Add(instance);
             return this;
         }
 
 
         public IAlertDialog Add(DialogAction action)
         {
-            throw new NotImplementedException();
+            this.actions.Add(action);
+            return this;
         }
 
 
         public void Show()
         {
-            this.builder = new AlertDialog.Builder(this.activity);
             this.activity.RunOnUiThread(() =>
             {
+                //var layout = new LinearLayout(context) {
+                //    Orientation = Orientation.Vertical,
+                //    OverScrollMode = OverScrollMode.IfContentScrolls
+                //};
+                //var txt = new TextView(context);
+                this.builder = new AlertDialog.Builder(this.activity)
+                    .SetCancelable(this.IsCancellable)
+                    .SetMessage(this.Message)
+                    .SetTitle(this.Title);
+
+                //if (this.Config.Cancel == null)
+                //{
+                //    dialog.SetCancelable(false);
+                //    dialog.SetCanceledOnTouchOutside(false);
+                //}
+                //else
+                //{
+                //    dialog.SetCancelable(true);
+                //    dialog.SetCanceledOnTouchOutside(true);
+                //    dialog.CancelEvent += (sender, args) => this.Config.Cancel.Action.Invoke();
+                //}
+                if (this.Positive != null)
+                {
+                    this.builder.SetPositiveButton(
+                        this.Positive.Label,
+                        (sender, args) => this.Positive.Command.TryExecute(null)
+                    );
+                }
+                if (this.Neutral != null)
+                {
+                    this.builder.SetNeutralButton(
+                        this.Neutral.Label,
+                        (sender, args) => this.Neutral.Command.TryExecute(null)
+                    );
+                }
+                if (this.Negative != null)
+                {
+                    this.builder.SetNegativeButton(
+                        this.Negative.Label,
+                        (sender, args) => this.Negative.Command.TryExecute(null)
+                    );
+                }
                 //frag.Config = config;
-                //this.Show(this.activity.SupportFragmentManager, FragmentTag);
+                if (this.TextEntries.Any())
+                {
+                    var layout = new LinearLayout(this.activity)
+                    {
+                        Orientation = Orientation.Vertical
+                    };
+                    foreach (var txt in this.TextEntries)
+                    {
+                        var editText = this.editTextBuilder.Create(this.activity, txt);
+                        layout.AddView(editText, ViewGroup.LayoutParams.MatchParent);
+                    }
+                    this.builder.SetView(layout);
+                }
+                //this.Show(this.activity.FragmentManager, FragmentTag);
+
+
+                this.dialog = this.builder.Create();
+                this.dialog.ShowEvent += (sender, args) =>
+                {
+                    //onChange(promptArgs);
+                    //this.GetButton(dialog, buttonId).Enabled = promptArgs.IsValid;
+                };
+                this.dialog.Window.SetSoftInputMode(SoftInput.StateVisible);
+                this.dialog.KeyPress += this.OnKeyPress;
             });
         }
 
+
         public Action Dismissed { get; set; }
-    }
-}
 
 
-/*
- // ALERT
-             //var layout = new LinearLayout(context) {
-            //    Orientation = Orientation.Vertical,
-            //    OverScrollMode = OverScrollMode.IfContentScrolls
-            //};
-            //var txt = new TextView(context);
-
-            return new AlertDialog
-                .Builder(activity)
-                .SetCancelable(false)
-                .SetMessage(config.Message)
-                .SetTitle(config.Title)
-                .SetPositiveButton(config.OkText, (o, e) => config.OnAction?.Invoke())
-                .Create();
-
-
-    // ACTIONSHEET
-    var dlg = new AlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
-                .SetTitle(config.Title);
-            //.SetCustomTitle(new TextView(activity) {
-            //    Text = config.Title,
-            //    TextSize = 18.0f
-            //});
-
-            if (config.ItemIcon != null || config.Options.Any(x => x.ItemIcon != null))
-            {
-                var adapter = new ActionSheetListAdapter(activity, Android.Resource.Layout.SelectDialogItem,
-                    Android.Resource.Id.Text1, config);
-                dlg.SetAdapter(adapter, (s, a) => config.Options[a.Which].Action?.Invoke());
-            }
-            else
-            {
-                var array = config
-                    .Options
-                    .Select(x => x.Text)
-                    .ToArray();
-
-                dlg.SetItems(array, (s, args) => config.Options[args.Which].Action?.Invoke());
-            }
-
-            if (config.Destructive != null)
-                dlg.SetNegativeButton(config.Destructive.Text, (s, a) => config.Destructive.Action?.Invoke());
-
-            if (config.Cancel != null)
-                dlg.SetNeutralButton(config.Cancel.Text, (s, a) => config.Cancel.Action?.Invoke());
-
-            return dlg.Create();
-
-
-    // CONFIRM
-            return new AlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
-                .SetCancelable(false)
-                .SetMessage(config.Message)
-                .SetTitle(config.Title)
-                .SetPositiveButton(config.OkText, (s, a) => config.OnAction(true))
-                .SetNegativeButton(config.CancelText, (s, a) => config.OnAction(false))
-                .Create();
-
-    // LOGIN
-var txtUser = new EditText(activity)
-            {
-                Hint = config.LoginPlaceholder,
-                InputType = InputTypes.TextVariationVisiblePassword,
-                Text = config.LoginValue ?? String.Empty
-            };
-            var txtPass = new EditText(activity)
-            {
-                Hint = config.PasswordPlaceholder ?? "*"
-            };
-            PromptBuilder.SetInputType(txtPass, InputType.Password);
-
-            var layout = new LinearLayout(activity)
-            {
-                Orientation = Orientation.Vertical
-            };
-
-            txtUser.SetMaxLines(1);
-            txtPass.SetMaxLines(1);
-
-            layout.AddView(txtUser, ViewGroup.LayoutParams.MatchParent);
-            layout.AddView(txtPass, ViewGroup.LayoutParams.MatchParent);
-
-            return new AlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
-                .SetCancelable(false)
-                .SetTitle(config.Title)
-                .SetMessage(config.Message)
-                .SetView(layout)
-                .SetPositiveButton(config.OkText, (s, a) =>
-                    config.OnAction(new LoginResult(true, txtUser.Text, txtPass.Text))
-                )
-                .SetNegativeButton(config.CancelText, (s, a) =>
-                    config.OnAction(new LoginResult(false, txtUser.Text, txtPass.Text))
-                )
-                .Create();
-
-    // PROMPT
-var txt = new EditText(activity)
-            {
-                Id = Int32.MaxValue,
-                Hint = config.Placeholder
-            };
-            if (config.Text != null)
-                txt.Text = config.Text;
-
-            if (config.MaxLength != null)
-                txt.SetFilters(new [] { new InputFilterLengthFilter(config.MaxLength.Value) });
-
-            SetInputType(txt, config.InputType);
-
-            var builder = new AlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
-                .SetCancelable(false)
-                .SetMessage(config.Message)
-                .SetTitle(config.Title)
-                .SetView(txt);
-
-            if (config.Positive != null)
-            {
-                builder.SetPositiveButton(config.Positive.Text, (s, a) =>
-                    config.OnAction(new DialogResult<string>(DialogChoice.Positive, txt.Text.Trim()))
-                );
-            }
-
-            if (config.Neutral != null)
-            {
-                builder.SetNeutralButton(config.Neutral.Text, (s, a) =>
-                    config.OnAction(new DialogResult<string>(DialogChoice.Neutral, txt.Text.Trim()))
-                );
-            }
-
-            if (config.Negative != null)
-            {
-                builder.SetNegativeButton(config.Negative.Text, (s, a) =>
-                    config.OnAction(new DialogResult<string>(DialogChoice.Negative, txt.Text.Trim()))
-                );
-            }
-            var dialog = builder.Create();
-            this.HookTextChanged(dialog, txt, config.OnTextChanged);
-
-            return dialog;
-
-
-
-    protected virtual void HookTextChanged(Dialog dialog, EditText txt, Action<PromptTextChangedArgs> onChange)
+        protected virtual void OnKeyPress(object sender, DialogKeyEventArgs args)
         {
-            if (onChange == null)
-                return;
+            args.Handled = false;
 
-            var buttonId = (int) Android.Content.DialogButtonType.Positive;
-            var promptArgs = new PromptTextChangedArgs { Value = String.Empty };
-
-            dialog.ShowEvent += (sender, args) =>
+            switch (args.KeyCode)
             {
-                onChange(promptArgs);
-                ((AlertDialog)dialog).GetButton(buttonId).Enabled = promptArgs.IsValid;
-            };
-            txt.AfterTextChanged += (sender, args) =>
-            {
-                promptArgs.IsValid = true;
-                promptArgs.Value = txt.Text;
-                onChange(promptArgs);
-                ((AlertDialog)dialog).GetButton(buttonId).Enabled = promptArgs.IsValid;
+                case Keycode.Back:
+                    args.Handled = true;
+                    //if (this.IsCancellable)
+                    //    this.SetAction(false);
+                    break;
 
-                if (!txt.Text.Equals(promptArgs.Value))
-                {
-                    txt.Text = promptArgs.Value;
-                    txt.SetSelection(txt.Text.Length);
-                }
-            };
+                case Keycode.Enter:
+                    args.Handled = true;
+                    //this.SetAction(true);
+                    break;
+            }
         }
-
-
-        //protected override void OnKeyPress(object sender, DialogKeyEventArgs args)
-        //{
-        //    base.OnKeyPress(sender, args);
-        //    args.Handled = false;
-
-        //    switch (args.KeyCode)
-        //    {
-        //        case Keycode.Back:
-        //            args.Handled = true;
-        //            if (this.Config.IsCancellable)
-        //                this.SetAction(false);
-        //        break;
-
-        //        case Keycode.Enter:
-        //            args.Handled = true;
-        //            this.SetAction(true);
-        //        break;
-        //    }
-        //}
-
 
         //protected virtual void SetAction(bool ok)
         //{
@@ -293,4 +191,53 @@ var txt = new EditText(activity)
         //    this.Config?.OnAction(new PromptResult(ok, txt.Text.Trim()));
         //    this.Dismiss();
         //}
-     */
+
+    }
+}
+
+
+/*
+if (config.ItemIcon != null || config.Options.Any(x => x.ItemIcon != null))
+{
+    var adapter = new ActionSheetListAdapter(activity, Android.Resource.Layout.SelectDialogItem,
+        Android.Resource.Id.Text1, config);
+    dlg.SetAdapter(adapter, (s, a) => config.Options[a.Which].Action?.Invoke());
+}
+else
+{
+    var array = config
+        .Options
+        .Select(x => x.Text)
+        .ToArray();
+
+    dlg.SetItems(array, (s, args) => config.Options[args.Which].Action?.Invoke());
+}
+
+protected virtual void HookTextChanged(Dialog dialog, EditText txt, Action<PromptTextChangedArgs> onChange)
+{
+if (onChange == null)
+    return;
+
+var buttonId = (int) Android.Content.DialogButtonType.Positive;
+var promptArgs = new PromptTextChangedArgs { Value = String.Empty };
+
+dialog.ShowEvent += (sender, args) =>
+{
+    onChange(promptArgs);
+    ((AlertDialog)dialog).GetButton(buttonId).Enabled = promptArgs.IsValid;
+};
+txt.AfterTextChanged += (sender, args) =>
+{
+    promptArgs.IsValid = true;
+    promptArgs.Value = txt.Text;
+    onChange(promptArgs);
+    ((AlertDialog)dialog).GetButton(buttonId).Enabled = promptArgs.IsValid;
+
+    if (!txt.Text.Equals(promptArgs.Value))
+    {
+        txt.Text = promptArgs.Value;
+        txt.SetSelection(txt.Text.Length);
+    }
+};
+
+*/

@@ -7,6 +7,8 @@ namespace Acr.UserDialogs
 {
     public interface IAlertDialog : IDisposable
     {
+        // TODO: IsShown, AndroidStyleId
+
         string Title { get; set; }
         string Message { get; set; }
         bool IsCancellable { get; set; }

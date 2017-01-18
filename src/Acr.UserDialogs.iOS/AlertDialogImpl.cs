@@ -25,7 +25,8 @@ namespace Acr.UserDialogs
             this.alert = UIAlertController.Create(this.Title, this.Message, style);
 
             //this.alert.View.TintColor
-            this.alert.View.BackgroundColor = this.BackgroundColor.Value.ToNative();
+            if (this.BackgroundColor != null)
+                this.alert.View.BackgroundColor = this.BackgroundColor.Value.ToNative();
 
             foreach (var action in this.Actions)
             {

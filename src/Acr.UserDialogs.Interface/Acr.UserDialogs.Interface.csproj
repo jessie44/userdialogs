@@ -49,6 +49,7 @@
     <Compile Include="Credentials.cs" />
     <Compile Include="DialogChoice.cs" />
     <Compile Include="DialogResult.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FontAttributes.cs" />
     <Compile Include="IAlertDialog.cs" />
     <Compile Include="DialogAction.cs" />

@@ -7,16 +7,16 @@ using Android.Widget;
 using Splat;
 
 
-namespace Acr.UserDialogs.AppCompat
+namespace Acr.UserDialogs
 {
     public class AppCompatToast : IDisposable
     {
         readonly Activity activity;
-        readonly ToastConfig config;
+        readonly SnackbarConfig config;
         Snackbar snackBar;
 
 
-        public AppCompatToast(Activity activity, ToastConfig config)
+        public AppCompatToast(Activity activity, SnackbarConfig config)
         {
             this.activity = activity;
             this.config = config;
@@ -27,7 +27,7 @@ namespace Acr.UserDialogs.AppCompat
         {
             this.activity.RunOnUiThread(() =>
             {
-                var view = activity.Window.DecorView.RootView.FindViewById(Android.Resource.Id.Content);
+                var view = this.activity.Window.DecorView.RootView.FindViewById(Android.Resource.Id.Content);
                 this.snackBar = Snackbar.Make(
                     view,
                     Html.FromHtml(this.config.Message),
@@ -37,16 +37,18 @@ namespace Acr.UserDialogs.AppCompat
                 if (this.config.BackgroundColor != null)
                     this.snackBar.View.SetBackgroundColor(this.config.BackgroundColor.Value.ToNative());
 
-                if (this.config.Action != null)
+                if (this.config.ActionButton != null)
                 {
-                    this.snackBar.SetAction(this.config.Action.Text, x =>
+                    this.snackBar.SetAction(this.config.ActionButton.Label, x =>
                     {
-                        this.config.Action?.Action?.Invoke();
-                        this.snackBar.Dismiss();
+                        var executed = this.config.ActionButton.Command?.TryExecute(null) ?? true;
+                        if (executed)
+                            this.snackBar.Dismiss();
                     });
-                    var color = this.config.Action.TextColor ?? ToastConfig.DefaultActionTextColor;
-                    if (color != null)
-                        this.snackBar.SetActionTextColor(color.Value.ToNative());
+                    //TODO
+                    //var color = this.config.ActionButton.TextColor ?? SnackbarConfig.DefaultActionTextColor;
+                    //if (color != null)
+                    //    this.snackBar.SetActionTextColor(color.Value.ToNative());
                 }
                 this.snackBar.Show();
             });
@@ -55,7 +57,7 @@ namespace Acr.UserDialogs.AppCompat
 
         protected virtual void TrySetToastTextColor()
         {
-            var textColor = this.config.MessageTextColor ?? ToastConfig.DefaultMessageTextColor;
+            var textColor = this.config.MessageTextColor ?? SnackbarConfig.DefaultMessageTextColor;
             if (textColor == null)
                 return;
 
