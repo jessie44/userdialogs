@@ -13,11 +13,14 @@ namespace Acr.UserDialogs
 
         IAlertDialog Alert(string message, string title = null, string okText = null, Action<DialogChoice> action = null);
         IAlertDialog Alert(AlertConfig config);
-        Task<DialogChoice> AlertAsync(string message, string title = null, string okText = null, CancellationToken? cancelToken = null);
-        Task<DialogChoice> AlertAsync(AlertConfig config, CancellationToken? cancelToken = null);
+        Task AlertAsync(string message, string title = null, string okText = null, CancellationToken? cancelToken = null);
+        Task AlertAsync(AlertConfig config, CancellationToken? cancelToken = null);
 
         IAlertDialog ActionSheet(ActionSheetConfig config);
         Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons);
+
+        // TODO: take out of actionsheet, can switch to grids and other things
+        //IAlertDialog BottomSheet()
 
         IAlertDialog Confirm(ConfirmConfig config);
         Task<bool> ConfirmAsync(string message, string title = null, string okText = null, string cancelText = null, CancellationToken? cancelToken = null);
@@ -43,13 +46,12 @@ namespace Acr.UserDialogs
         IProgressDialog Loading(string title = null, Action onCancel = null, string cancelText = null, bool show = true, MaskType? maskType = null);
         IProgressDialog Progress(string title = null, Action onCancel = null, string cancelText = null, bool show = true, MaskType? maskType = null);
 
-
         void ShowImage(IBitmap image, string message, int timeoutMillis = 2000);
 
-        //IDisposable Snackbar(string title, TimeSpan? dismissTimer = null);
-        //IDisposable Snackbar(ToastConfig config);
+        IDisposable Snackbar(string message, TimeSpan? dismissTimer = null, ScreenPosition position = ScreenPosition.Bottom);
+        IDisposable Snackbar(SnackbarConfig config);
 
-        IDisposable Toast(string title, TimeSpan? dismissTimer = null);
+        IDisposable Toast(string message, TimeSpan? dismissTimer = null, ScreenPosition position = ScreenPosition.Bottom);
         IDisposable Toast(ToastConfig cfg);
     }
 }

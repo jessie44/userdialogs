@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Splat;
 using UIKit;
 
 
@@ -22,6 +23,9 @@ namespace Acr.UserDialogs
         {
             var style = this.Actions.Any() ? UIAlertControllerStyle.ActionSheet : UIAlertControllerStyle.Alert;
             this.alert = UIAlertController.Create(this.Title, this.Message, style);
+
+            //this.alert.View.TintColor
+            this.alert.View.BackgroundColor = this.BackgroundColor.Value.ToNative();
 
             foreach (var action in this.Actions)
             {
@@ -48,30 +52,33 @@ namespace Acr.UserDialogs
         {
             txt.PropertyChanged += (sender, args) =>
             {
+                switch (args.PropertyName)
+                {
 
+                }
             };
         }
 
-        protected virtual IAlertDialog SetMainAction(DialogChoice choice, Action<DialogAction> action)
-        {
-            //var obj = new DialogAction { Choice = choice };
-            //action(obj);
-            //switch (choice)
-            //{
-            //    case DialogChoice.Positive:
-            //        this.Positive = obj;
-            //        break;
+        //protected virtual IAlertDialog SetMainAction(DialogChoice choice, Action<DialogAction> action)
+        //{
+        //    //var obj = new DialogAction { Choice = choice };
+        //    //action(obj);
+        //    //switch (choice)
+        //    //{
+        //    //    case DialogChoice.Positive:
+        //    //        this.Positive = obj;
+        //    //        break;
 
-            //    case DialogChoice.Negative:
-            //        this.Negative = obj;
-            //        break;
+        //    //    case DialogChoice.Negative:
+        //    //        this.Negative = obj;
+        //    //        break;
 
-            //    case DialogChoice.Neutral:
-            //        this.Neutral = obj;
-            //        break;
-            //}
-            return this;
-        }
+        //    //    case DialogChoice.Neutral:
+        //    //        this.Neutral = obj;
+        //    //        break;
+        //    //}
+        //    return this;
+        //}
 
 
         //void AddNativeMainAction(UIAlertController ctrl, DialogAction action)

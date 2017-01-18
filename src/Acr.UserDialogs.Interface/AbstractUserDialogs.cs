@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Splat;
@@ -10,29 +11,85 @@ namespace Acr.UserDialogs
     {
         const string NO_ONACTION = "OnAction should not be set as async will not use it";
 
-        public abstract IAlertDialog CreateDialog();
         protected abstract IProgressDialog CreateDialogInstance(ProgressDialogConfig config);
-        public abstract IDisposable Toast(ToastConfig config);
+        public abstract IAlertDialog CreateDialog();
         public abstract IDisposable DatePrompt(DatePromptConfig config);
         public abstract IDisposable TimePrompt(TimePromptConfig config);
+        public abstract IDisposable Toast(ToastConfig config);
+        //public abstract IDisposable Snackbar(SnackbarConfig config);
         public abstract void ShowImage(IBitmap image, string message, int timeoutMillis);
 
-
-        public virtual IDisposable Toast(string message, TimeSpan? dismissTimer)
+        public virtual IDisposable Snackbar(SnackbarConfig config)
         {
-            return this.Toast(new ToastConfig(message)
-            {
-                Duration = dismissTimer ?? ToastConfig.DefaultDuration
-            });
+            throw new NotImplementedException(); // TODO
         }
 
 
-        static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
+        #region Internal Helpers
+
+        protected static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
         {
             disp.Dispose();
             tcs.TrySetCanceled();
         }
 
+        #endregion
+
+        #region Create Dialogs
+        // WARNING: do not engaged Show from these methods, some of the configs have not finished populating
+
+        protected virtual IAlertDialog CreateDialogFromConfig(AbstractMultiActionDialogConfig config)
+        {
+            var dlg = this.CreateDialog();
+            this.SetDialogConfig(dlg, config);
+            return dlg;
+        }
+
+
+        protected virtual IAlertDialog CreateDialogFromConfig(AbstractDialogConfig config)
+        {
+            var dlg = this.CreateDialog();
+            this.SetDialogConfig(dlg, config);
+            dlg.Show();
+
+            return dlg;
+        }
+
+
+        protected virtual void SetDialogConfig(IAlertDialog dlg, IDialogConfig config)
+        {
+            dlg.Title = config.Title;
+            dlg.Message = config.Message;
+            dlg.MessageTextColor = config.MessageTextColor;
+            dlg.BackgroundColor = config.BackgroundColor;
+            dlg.IsCancellable = config.IsCancellable;
+        }
+
+        #endregion
+
+        #region Toasts/Snackbars
+
+        public virtual IDisposable Toast(string message, TimeSpan? dismissTimer, ScreenPosition screenPosition)
+        {
+            return this.Toast(new ToastConfig(message)
+            {
+                Duration = dismissTimer ?? ToastConfig.DefaultDuration,
+                Position = screenPosition
+            });
+        }
+
+
+        public IDisposable Snackbar(string message, TimeSpan? dismissTimer = null, ScreenPosition position = ScreenPosition.Bottom)
+        {
+            return this.Snackbar(new SnackbarConfig(message)
+            {
+                Duration = dismissTimer ?? SnackbarConfig.DefaultDuration,
+                Position = position
+            });
+        }
+
+
+        #endregion
 
         #region Progress Dialogs
 
@@ -98,24 +155,39 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog ActionSheet(ActionSheetConfig config)
         {
-            var dlg = this.CreateDialog();
-            //dlg.Positive = config.Positive;
-
-            return null;
+            var dlg = this.CreateDialogFromConfig(config);
+            foreach (var action in config.Actions)
+            {
+                dlg.Add(action);
+            }
+            return dlg;
         }
 
-        public virtual async Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons)
+
+        public virtual Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons)
         {
             var tcs = new TaskCompletionSource<string>();
             var cfg = new ActionSheetConfig();
             if (title != null)
                 cfg.Title = title;
 
-            // you must have a cancel option for actionsheetasync
-            //cfg.SetCancel(cancel, () => tcs.TrySetResult(cancel));
-
-            //if (destructive != null)
-            //    cfg.SetDestructive(destructive, () => tcs.TrySetResult(destructive));
+            // TODO: cancel button can be null, but can still be cancellable by tapping outside
+            if (cancel != null)
+            {
+                cfg.Neutral = new DialogAction
+                {
+                    Label = cancel,
+                    Command = new Command(() => tcs.TrySetResult(cancel))
+                };
+            }
+            if (destructive != null)
+            {
+                cfg.Negative = new DialogAction
+                {
+                    Label = destructive,
+                    Command = new Command(() => tcs.TrySetResult(destructive))
+                };
+            }
 
             //foreach (var btn in buttons)
             //    cfg.Add(btn, () => tcs.TrySetResult(btn));
@@ -123,7 +195,7 @@ namespace Acr.UserDialogs
             var disp = this.ActionSheet(cfg);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return await tcs.Task;
+                return tcs.Task;
             }
         }
 
@@ -133,11 +205,9 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Alert(AlertConfig config)
         {
-            var dlg = this.CreateDialog();
+            var dlg = this.CreateDialogFromConfig(config);
 
-            dlg.Show();
-
-            return null;
+            return dlg;
         }
 
 
@@ -151,23 +221,23 @@ namespace Acr.UserDialogs
             return null;
         }
 
-        public virtual async Task<DialogChoice> AlertAsync(AlertConfig config, CancellationToken? cancelToken = null)
+        public virtual async Task AlertAsync(AlertConfig config, CancellationToken? cancelToken = null)
         {
             if (config.OnAction != null)
                 throw new ArgumentException(NO_ONACTION);
 
-            var tcs = new TaskCompletionSource<DialogChoice>();
-            config.OnAction = x => tcs.TrySetResult(x);
+            var tcs = new TaskCompletionSource<object>();
+            config.OnAction = () => tcs.TrySetResult(null);
 
             var disp = this.Alert(config);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return await tcs.Task;
+                await tcs.Task;
             }
         }
 
 
-        public virtual Task<DialogChoice> AlertAsync(string message, string title, string okText, CancellationToken? cancelToken = null)
+        public virtual Task AlertAsync(string message, string title, string okText, CancellationToken? cancelToken = null)
         {
             //return this.AlertAsync(new AlertConfig()
             //    .SetMessage(message)
@@ -184,26 +254,26 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Confirm(ConfirmConfig config)
         {
-            var dlg = this.CreateDialog();
-            dlg.Title = config.Title;
-            dlg.Message = config.Message;
-            dlg.IsCancellable = config.IsCancellable;
+            var dlg = this.CreateDialogFromConfig(config);
+            //dlg.Title = config.Title;
+            //dlg.Message = config.Message;
+            //dlg.IsCancellable = config.IsCancellable;
 
-            dlg.Add(new DialogAction
-            {
-                Label = config.Positive.Label, // ?? ConfirmConfig.DefaultPositive.Label
-                Choice = DialogChoice.Positive,
-                Tap = x => config.OnAction(true)
-            });
-            if (config.Neutral != null)
-            {
-                dlg.Add(new DialogAction
-                {
-                    Label = config.Neutral.Label, // ?? ConfirmConfig.DefaultNeutral.Label
-                    Choice = DialogChoice.Neutral,
-                    Tap = x => config.OnAction(false)
-                });
-            }
+            //dlg.Add(new DialogAction
+            //{
+            //    Label = config.Positive.Label, // ?? ConfirmConfig.DefaultPositive.Label
+            //    Choice = DialogChoice.Positive,
+            //    Tap = x => config.OnAction(true)
+            //});
+            //if (config.Neutral != null)
+            //{
+            //    dlg.Add(new DialogAction
+            //    {
+            //        Label = config.Neutral.Label, // ?? ConfirmConfig.DefaultNeutral.Label
+            //        Choice = DialogChoice.Neutral,
+            //        Tap = x => config.OnAction(false)
+            //    });
+            //}
             dlg.Show();
 
             return dlg;
@@ -212,21 +282,22 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Confirm(string message, Action<bool> onAction, string title, string okText, string cancelText)
         {
-            return this.Confirm(new ConfirmConfig
-            {
-                Title = title,
-                Message = message,
-                Positive = new DialogAction
-                {
-                    Label = okText,
-                    Tap = x => onAction(true)
-                },
-                Neutral = new DialogAction
-                {
-                    Label = cancelText,
-                    Tap = x => onAction(true)
-                }
-            });
+            //return this.Confirm(new ConfirmConfig
+            //{
+            //    Title = title,
+            //    Message = message,
+            //    Positive = new DialogAction
+            //    {
+            //        Label = okText,
+            //        Tap = x => onAction(true)
+            //    },
+            //    Neutral = new DialogAction
+            //    {
+            //        Label = cancelText,
+            //        Tap = x => onAction(true)
+            //    }
+            //});
+            return null;
         }
 
 
@@ -259,7 +330,7 @@ namespace Acr.UserDialogs
 
         #region Date/Time
 
-        public virtual async Task<DialogResult<DateTime>> DatePromptAsync(DatePromptConfig config, CancellationToken? cancelToken = null)
+        public virtual Task<DialogResult<DateTime>> DatePromptAsync(DatePromptConfig config, CancellationToken? cancelToken = null)
         {
             if (config.OnAction != null)
                 throw new ArgumentException(NO_ONACTION);
@@ -270,7 +341,7 @@ namespace Acr.UserDialogs
             var disp = this.DatePrompt(config);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return await tcs.Task;
+                return tcs.Task;
             }
         }
 
@@ -288,7 +359,7 @@ namespace Acr.UserDialogs
         }
 
 
-        public virtual async Task<DialogResult<TimeSpan>> TimePromptAsync(TimePromptConfig config, CancellationToken? cancelToken = null)
+        public virtual Task<DialogResult<TimeSpan>> TimePromptAsync(TimePromptConfig config, CancellationToken? cancelToken = null)
         {
             if (config.OnAction != null)
                 throw new ArgumentException(NO_ONACTION);
@@ -299,7 +370,7 @@ namespace Acr.UserDialogs
             var disp = this.TimePrompt(config);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return await tcs.Task;
+                return tcs.Task;
             }
         }
 
@@ -364,18 +435,18 @@ namespace Acr.UserDialogs
 
             dlg.Dismissed = () => { };
 
-            if (config.Positive != null)
-            {
+            //if (config.Positive != null)
+            //{
 
-            }
-            if (config.Neutral != null)
-            {
+            //}
+            //if (config.Neutral != null)
+            //{
 
-            }
-            if (config.Negative != null)
-            {
+            //}
+            //if (config.Negative != null)
+            //{
 
-            }
+            //}
             // TODO: 3 buttons
             return dlg;
         }

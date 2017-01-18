@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 
 
 namespace Acr.UserDialogs
@@ -27,6 +28,8 @@ namespace Acr.UserDialogs
         protected List<TextEntry> InternalTextEntries { get; } = new List<TextEntry>();
         protected List<DialogAction> InternalActions { get; } = new List<DialogAction>();
 
+        public Color? MessageTextColor { get; set; }
+        public Color? BackgroundColor { get; set; }
 
         public string Message { get; set; }
         public string Title { get; set; }

@@ -39,10 +39,12 @@
     </Compile>
     <Compile Include="AbstractAlertDialog.cs" />
     <Compile Include="AbstractDialogConfig.cs" />
+    <Compile Include="AbstractMultiActionDialogConfig.cs" />
     <Compile Include="AbstractUserDialogs.cs" />
     <Compile Include="ActionSheetConfig.cs" />
     <Compile Include="AlertConfig.cs" />
     <Compile Include="AbstractNpc.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="ConfirmConfig.cs" />
     <Compile Include="Credentials.cs" />
     <Compile Include="DialogChoice.cs" />
@@ -51,8 +53,10 @@
     <Compile Include="IAlertDialog.cs" />
     <Compile Include="DialogAction.cs" />
     <Compile Include="IDialogConfig.cs" />
-    <Compile Include="TextEntry.cs" />
     <Compile Include="PromptTextChangedArgs.cs" />
+    <Compile Include="ScreenPosition.cs" />
+    <Compile Include="SnackbarConfig.cs" />
+    <Compile Include="TextEntry.cs" />
     <Compile Include="TimePromptConfig.cs" />
     <Compile Include="DatePromptConfig.cs" />
     <Compile Include="KeyboardType.cs" />
@@ -63,7 +67,6 @@
     <Compile Include="ProgressDialogConfig.cs" />
     <Compile Include="PromptConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToastAction.cs" />
     <Compile Include="ToastConfig.cs" />
   </ItemGroup>
   <ItemGroup>

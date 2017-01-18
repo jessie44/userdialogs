@@ -5,6 +5,7 @@ namespace Acr.UserDialogs
 {
     public class AlertConfig : AbstractDialogConfig
     {
-        public Action<DialogChoice> OnAction { get; set; }
+        public DialogAction OkButton { get; set; }
+        public Action OnAction { get; set; }
     }
 }
