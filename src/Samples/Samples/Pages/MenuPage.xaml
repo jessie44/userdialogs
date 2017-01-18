@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Samples.ViewModels;assembly=Samples"
+             x:Class="Samples.Pages.MenuPage"
+             Title="User Dialogs">
+
+    <ContentPage.BindingContext>
+        <viewModels:MenuViewModel />
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <ListView ItemsSource="{Binding Items}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Text}" Command="{Binding Command}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ContentPage.Content>
+</ContentPage>

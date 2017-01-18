@@ -4,16 +4,16 @@ using Samples.ViewModels;
 using Xamarin.Forms;
 
 
-namespace Samples
+namespace Samples.Pages
 {
-    public partial class StandardPage : ContentPage
+    public partial class ToastsPage : ContentPage
     {
-        public StandardPage()
+        public ToastsPage()
         {
             InitializeComponent();
 
             // the idea here is that you would dependency inject userdialogs
-            this.BindingContext = new StandardViewModel(UserDialogs.Instance);
+            this.BindingContext = new ToastsViewModel(UserDialogs.Instance);
         }
     }
 }

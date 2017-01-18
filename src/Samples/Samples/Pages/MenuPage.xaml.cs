@@ -2,11 +2,11 @@
 using Xamarin.Forms;
 
 
-namespace Samples
+namespace Samples.Pages
 {
-    public partial class MainPage : TabbedPage
+    public partial class MenuPage : ContentPage
     {
-        public MainPage()
+        public MenuPage()
         {
             InitializeComponent();
         }
