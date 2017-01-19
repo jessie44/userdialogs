@@ -3,15 +3,15 @@ using Android.App;
 using AndroidHUD;
 
 
-namespace Acr.UserDialogs.Classic
+namespace Acr.UserDialogs.Internals
 {
-    public class ClassicToast : IDisposable
+    public class Toast : IDisposable
     {
         readonly Activity activity;
         readonly ToastConfig config;
 
 
-        public ClassicToast(Activity activity, ToastConfig config)
+        public Toast(Activity activity, ToastConfig config)
         {
             this.activity = activity;
             this.config = config;
@@ -20,6 +20,7 @@ namespace Acr.UserDialogs.Classic
 
         public void Show()
         {
+            // TODO: position?
             AndHUD.Shared.ShowToast(
                 this.activity,
                 this.config.Message,
@@ -29,7 +30,7 @@ namespace Acr.UserDialogs.Classic
                 () =>
                 {
                     AndHUD.Shared.Dismiss();
-                    this.config.Action?.Action?.Invoke();
+                    //this.config.Action?.Action?.Invoke();
                 }
             );
         }

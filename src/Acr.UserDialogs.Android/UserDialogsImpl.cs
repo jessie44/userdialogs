@@ -1,15 +1,9 @@
 using System;
 using Acr.UserDialogs.AppCompat;
-using Acr.UserDialogs.Builders;
 using Acr.UserDialogs.Classic;
-using Acr.UserDialogs.Fragments;
+using Acr.UserDialogs.Internals;
 using Android.App;
-using Android.Text;
-using Android.Views;
-using Android.Widget;
-using Android.Support.V4.App;
 using Android.Support.V7.App;
-using Android.Support.Design.Widget;
 using AndroidHUD;
 using Splat;
 
@@ -20,21 +14,25 @@ namespace Acr.UserDialogs
     {
         public static string FragmentTag { get; set; } = "UserDialogs";
         protected internal Func<Activity> TopActivityFunc { get; set; }
+        readonly IEditTextBuilder editTextBuilder;
 
 
-        public UserDialogsImpl(Func<Activity> getTopActivity)
+        public UserDialogsImpl(Func<Activity> getTopActivity, EditTextBuilder editTextBuilder = null)
         {
             this.TopActivityFunc = getTopActivity;
+            this.editTextBuilder = editTextBuilder ?? new EditTextBuilder();
         }
 
 
         public override IAlertDialog CreateDialog()
         {
             var activity = this.TopActivityFunc();
-            if (activity is AppCompatActivity)
-                return new AppCompatAlertDialog(activity);
+            var appcompat = activity as AppCompatActivity;
 
-            return new ClassicAlertDialog(activity);
+            if (appcompat != null)
+                return new AppCompatAlertDialog(appcompat, this.editTextBuilder);
+
+            return new ClassicAlertDialog(activity, this.editTextBuilder);
         }
 
 
@@ -108,27 +106,29 @@ namespace Acr.UserDialogs
 
         public override IDisposable DatePrompt(DatePromptConfig config)
         {
-            var activity = this.TopActivityFunc();
-            if (activity is AppCompatActivity)
-                return this.ShowDialog<DateAppCompatDialogFragment, DatePromptConfig>((AppCompatActivity)activity, config);
+            //var activity = this.TopActivityFunc();
+            //if (activity is AppCompatActivity)
+            //    return this.ShowDialog<DateAppCompatDialogFragment, DatePromptConfig>((AppCompatActivity)activity, config);
 
-            if (activity is FragmentActivity)
-                return this.ShowDialog<DateDialogFragment, DatePromptConfig>((FragmentActivity)activity, config);
+            //if (activity is FragmentActivity)
+            //    return this.ShowDialog<DateDialogFragment, DatePromptConfig>((FragmentActivity)activity, config);
 
-            return this.Show(activity, () => DatePromptBuilder.Build(activity, config));
+            //return this.Show(activity, () => DatePromptBuilder.Build(activity, config));
+            throw new NotImplementedException();
         }
 
 
         public override IDisposable TimePrompt(TimePromptConfig config)
         {
-            var activity = this.TopActivityFunc();
-            if (activity is AppCompatActivity)
-                return this.ShowDialog<TimeAppCompatDialogFragment, TimePromptConfig>((AppCompatActivity)activity, config);
+            //var activity = this.TopActivityFunc();
+            //if (activity is AppCompatActivity)
+            //    return this.ShowDialog<TimeAppCompatDialogFragment, TimePromptConfig>((AppCompatActivity)activity, config);
 
-            if (activity is FragmentActivity)
-                return this.ShowDialog<TimeDialogFragment, TimePromptConfig>((FragmentActivity)activity, config);
+            //if (activity is FragmentActivity)
+            //    return this.ShowDialog<TimeDialogFragment, TimePromptConfig>((FragmentActivity)activity, config);
 
-            return this.Show(activity, () => TimePromptBuilder.Build(activity, config));
+            //return this.Show(activity, () => TimePromptBuilder.Build(activity, config));
+            throw new NotImplementedException();
         }
 
 
@@ -144,15 +144,19 @@ namespace Acr.UserDialogs
         public override IDisposable Toast(ToastConfig cfg)
         {
             var activity = this.TopActivityFunc();
-            var compat = activity as AppCompatActivity;
-
-            if (compat == null)
-                return new ClassicToast(this.activity, cfg);
-
-            return new AppCompatToast(activity, cfg);
+            return new Toast(activity, cfg);
         }
 
-        #region Internals
+
+        public override IDisposable Snackbar(SnackbarConfig config)
+        {
+            var activity = this.TopActivityFunc() as AppCompatActivity;
+            if (activity == null)
+                throw new ArgumentException("Snackbar on Android is only supported when your current activity inherit from AppCompatActivity");
+
+            return new AppCompatSnackbar(activity, config);
+        }
+
 
         protected override IProgressDialog CreateDialogInstance(ProgressDialogConfig config)
         {
@@ -172,8 +176,5 @@ namespace Acr.UserDialogs
 
             return dialog;
         }
-
-
-        #endregion
     }
 }

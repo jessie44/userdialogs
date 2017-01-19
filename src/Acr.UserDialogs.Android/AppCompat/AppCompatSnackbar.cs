@@ -7,16 +7,16 @@ using Android.Widget;
 using Splat;
 
 
-namespace Acr.UserDialogs
+namespace Acr.UserDialogs.AppCompat
 {
-    public class AppCompatToast : IDisposable
+    public class AppCompatSnackbar : IDisposable
     {
         readonly Activity activity;
         readonly SnackbarConfig config;
         Snackbar snackBar;
 
 
-        public AppCompatToast(Activity activity, SnackbarConfig config)
+        public AppCompatSnackbar(Activity activity, SnackbarConfig config)
         {
             this.activity = activity;
             this.config = config;
