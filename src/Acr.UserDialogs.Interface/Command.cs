@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Acr.UserDialogs
 {
-    public class Command : ICommand
+    internal class Command : ICommand
     {
         readonly Action action;
 
