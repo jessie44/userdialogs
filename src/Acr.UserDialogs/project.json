@@ -1,0 +1,10 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "NETStandard.Library": "1.6.1",
+    "Splat": "2.0.0"
+  },
+  "frameworks": {
+    "netstandard1.1": {}
+  }
+}

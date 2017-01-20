@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "targets": {
+    ".NETStandard,Version=v1.1": {
+      "Splat/2.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.1/Splat.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/Splat.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Splat/2.0.0": {
+      "sha512": "nu/hT3AaKHJvMlCTrbR2EG1n6nzOejbJsvx/LWiy7kM4PK7R/GdrtP5KN8VcXfi1x+mbPA3Mqcbe992D7DppyA==",
+      "type": "package",
+      "path": "splat/2.0.0",
+      "files": [
+        "lib/MonoAndroid403/Splat.dll",
+        "lib/Net45/Splat.dll",
+        "lib/Portable-Win81+Wpa81/Splat.dll",
+        "lib/Xamarin.Mac20/Splat.dll",
+        "lib/Xamarin.iOS10/Splat.dll",
+        "lib/netstandard1.1/Splat.dll",
+        "splat.2.0.0.nupkg.sha512",
+        "splat.nuspec",
+        "src/AssemblyFinder.cs",
+        "src/Bitmaps.cs",
+        "src/Logging.cs",
+        "src/MemoizingMRUCache.cs",
+        "src/ModeDetector.cs",
+        "src/PlatformModeDetector.cs",
+        "src/PointExtensions.cs",
+        "src/RectangleExtensions.cs",
+        "src/ReflectionStubs.cs",
+        "src/ServiceLocation.cs",
+        "src/SizeExtensions.cs",
+        "src/TypeForwardedSystemDrawing.cs"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "Splat >= 2.0.0"
+    ],
+    ".NETStandard,Version=v1.1": []
+  },
+  "packageFolders": {
+    "C:\\Users\\allan\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "restore": {
+      "projectUniqueName": "C:\\dev\\acr\\userdialogs\\src\\Acr.UserDialogs.Interface\\Acr.UserDialogs.Interface.csproj",
+      "projectName": "Acr.UserDialogs.Interface",
+      "projectPath": "C:\\dev\\acr\\userdialogs\\src\\Acr.UserDialogs.Interface\\Acr.UserDialogs.Interface.csproj",
+      "projectJsonPath": "C:\\dev\\acr\\userdialogs\\src\\Acr.UserDialogs.Interface\\project.json",
+      "outputType": "UAP"
+    },
+    "dependencies": {
+      "Splat": "2.0.0"
+    },
+    "frameworks": {
+      "netstandard1.1": {}
+    }
+  }
+}
