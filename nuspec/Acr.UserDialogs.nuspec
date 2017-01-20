@@ -22,10 +22,12 @@ Allows for messagebox style dialogs to be called from your shared/PCL/MVVM code
 On android, be sure to call UserDialogs.Init() before using!
 
 Supported Platforms
+- NET Standard 1.1
 - iOS 8+
 - Android
 - Universal Windows Platform (Win10/UWP)
-- NET Standard 1.1
+- macOS (coming soon)
+- tvOS (coming soon)
         </description>
         <authors>Allan Ritchie</authors>
         <owners>Allan Ritchie</owners>
@@ -38,6 +40,12 @@ Supported Platforms
         <tags>windows xamarin xam.pcl dialogs plugin</tags>
         <dependencies>
             <group>
+                <dependency id="Splat" version="[2, 3)" />
+            </group>
+            <group targetFramework="Xamarin.tvOS10">
+                <dependency id="Splat" version="[2, 3)" />
+            </group>
+            <group targetFramework="Xamarin.Mac20">
                 <dependency id="Splat" version="[2, 3)" />
             </group>
             <group targetFramework="Xamarin.iOS10">
@@ -68,7 +76,8 @@ EVERYTHING is netstandard!
 [feature] Snackbars and toasts both support screen position (top or bottom)
 [feature][ios] calendar, toasts, and snackbars now use material controls
 [breaking] Confirm is now just a wrapper signature around alert
-[fix][droid] ActionSheetAsync is fixed for dismiss
+[breaking] Many fluent methods were removed from the configs
+[fix] ActionSheetAsync is fixed for dismiss
         </releaseNotes>
     </metadata>
     <files>
@@ -92,5 +101,8 @@ EVERYTHING is netstandard!
 
         <!-- tvOS -->
         <!--<file src="..\src\Acr.UserDialogs.tvOS\bin\Release\Acr.UserDialogs.*" target="lib\Xamarin.tvOS10" />-->
+
+        <!-- tvOS -->
+        <!--<file src="..\src\Acr.UserDialogs.Mac\bin\Release\Acr.UserDialogs.*" target="lib\Xamarin.Mac20" />-->
     </files>
 </package>

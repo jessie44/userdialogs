@@ -40,7 +40,6 @@
     </Compile>
     <Compile Include="AbstractAlertDialog.cs" />
     <Compile Include="AbstractDialogConfig.cs" />
-    <Compile Include="AbstractMultiActionDialogConfig.cs" />
     <Compile Include="AbstractUserDialogs.cs" />
     <Compile Include="ActionSheetConfig.cs" />
     <Compile Include="AlertConfig.cs" />
@@ -51,7 +50,6 @@
     <Compile Include="DialogChoice.cs" />
     <Compile Include="DialogResult.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="FontAttributes.cs" />
     <Compile Include="IAlertDialog.cs" />
     <Compile Include="DialogAction.cs" />
     <Compile Include="IDialogConfig.cs" />

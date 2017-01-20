@@ -9,6 +9,7 @@ namespace Acr.UserDialogs
         public string Title { get; set; }
         public string Message { get; set; }
         public bool IsCancellable { get; set; }
+        public bool DisableImmediateShow { get; set; }
         public Color? MessageTextColor { get; set; }
         public Color? BackgroundColor { get; set; }
     }

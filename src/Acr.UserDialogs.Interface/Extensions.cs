@@ -17,5 +17,16 @@ namespace Acr.UserDialogs
 
             return execute;
         }
+
+
+        public static bool IsAnyEmpty(params TextEntry[] tbs)
+        {
+            foreach (var tb in tbs)
+            {
+                if (String.IsNullOrWhiteSpace(tb.Text))
+                    return true;
+            }
+            return false;
+        }
     }
 }

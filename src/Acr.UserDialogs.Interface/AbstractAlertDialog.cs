@@ -38,9 +38,9 @@ namespace Acr.UserDialogs
         public DialogAction Positive { get; set; }
         public DialogAction Neutral { get; set; }
         public DialogAction Negative { get; set; }
-        public Action Dismissed { get; set; }
         public IReadOnlyList<DialogAction> Actions { get; }
         public IReadOnlyList<TextEntry> TextEntries { get; }
+        public event EventHandler Dismissed;
 
 
         public IAlertDialog Add(TextEntry entry)
@@ -66,6 +66,12 @@ namespace Acr.UserDialogs
 
         protected virtual void Dispose(bool disposing)
         {
+        }
+
+
+        protected virtual void OnDismissed()
+        {
+            this.Dismissed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

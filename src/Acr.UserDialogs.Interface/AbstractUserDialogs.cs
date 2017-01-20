@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Splat;
@@ -10,59 +9,35 @@ namespace Acr.UserDialogs
     public abstract class AbstractUserDialogs : IUserDialogs
     {
         const string NO_ONACTION = "OnAction should not be set as async will not use it";
+        const string NO_ONACTION_SET = "You must set the OnAction of your config object";
 
         protected abstract IProgressDialog CreateDialogInstance(ProgressDialogConfig config);
         public abstract IAlertDialog CreateDialog();
         public abstract IDisposable DatePrompt(DatePromptConfig config);
         public abstract IDisposable TimePrompt(TimePromptConfig config);
         public abstract IDisposable Toast(ToastConfig config);
-        //public abstract IDisposable Snackbar(SnackbarConfig config);
         public abstract void ShowImage(IBitmap image, string message, int timeoutMillis);
-
-        public virtual IDisposable Snackbar(SnackbarConfig config)
-        {
-            throw new NotImplementedException(); // TODO
-        }
 
 
         #region Internal Helpers
 
-        protected static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
-        {
-            disp.Dispose();
-            tcs.TrySetCanceled();
-        }
-
-        #endregion
-
-        #region Create Dialogs
-        // WARNING: do not engaged Show from these methods, some of the configs have not finished populating
-
-        protected virtual IAlertDialog CreateDialogFromConfig(AbstractMultiActionDialogConfig config)
+        protected virtual IAlertDialog CreateDialogFromConfig(IDialogConfig config)
         {
             var dlg = this.CreateDialog();
-            this.SetDialogConfig(dlg, config);
-            return dlg;
-        }
-
-
-        protected virtual IAlertDialog CreateDialogFromConfig(AbstractDialogConfig config)
-        {
-            var dlg = this.CreateDialog();
-            this.SetDialogConfig(dlg, config);
-            dlg.Show();
-
-            return dlg;
-        }
-
-
-        protected virtual void SetDialogConfig(IAlertDialog dlg, IDialogConfig config)
-        {
             dlg.Title = config.Title;
             dlg.Message = config.Message;
             dlg.MessageTextColor = config.MessageTextColor;
             dlg.BackgroundColor = config.BackgroundColor;
             dlg.IsCancellable = config.IsCancellable;
+
+            return dlg;
+        }
+
+
+        protected static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
+        {
+            disp.Dispose();
+            tcs.TrySetCanceled();
         }
 
         #endregion
@@ -75,6 +50,17 @@ namespace Acr.UserDialogs
             {
                 Duration = dismissTimer ?? ToastConfig.DefaultDuration,
                 Position = screenPosition
+            });
+        }
+
+
+        public virtual IDisposable Snackbar(SnackbarConfig config)
+        {
+            // Transform to toast as UWP, tvOS, and macOS won't have a snackbar?
+            return this.Toast(new ToastConfig(config.Message)
+            {
+                Duration = config.Duration,
+                Action = () => config.ActionButton?.Command?.Execute(null)
             });
         }
 
@@ -171,27 +157,6 @@ namespace Acr.UserDialogs
             if (title != null)
                 cfg.Title = title;
 
-            // TODO: cancel button can be null, but can still be cancellable by tapping outside
-            if (cancel != null)
-            {
-                cfg.Neutral = new DialogAction
-                {
-                    Label = cancel,
-                    Command = new Command(() => tcs.TrySetResult(cancel))
-                };
-            }
-            if (destructive != null)
-            {
-                cfg.Negative = new DialogAction
-                {
-                    Label = destructive,
-                    Command = new Command(() => tcs.TrySetResult(destructive))
-                };
-            }
-
-            //foreach (var btn in buttons)
-            //    cfg.Add(btn, () => tcs.TrySetResult(btn));
-
             var disp = this.ActionSheet(cfg);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
@@ -205,8 +170,13 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Alert(AlertConfig config)
         {
+            if (config.OnAction == null)
+                throw new NullReferenceException(NO_ONACTION_SET);
+
             var dlg = this.CreateDialogFromConfig(config);
-            dlg.Show();
+            if (!config.DisableImmediateShow)
+                dlg.Show();
+
             return dlg;
         }
 
@@ -215,14 +185,10 @@ namespace Acr.UserDialogs
         {
             return new AlertConfig
             {
-                Title = title,
-                Message = message,
-                OkButton = new DialogAction
-                {
-                    // TODO: should be able to set iOS style (destructive, default, neutral)
-                    Label = okText, // default text if null (ie. AlertConfig.DefaultPositive.Text)
-                    Command = new Command(() => onOk?.Invoke())
-                }
+                Title = title ?? String.Empty,
+                Message = message ?? String.Empty,
+                OkText = okText ?? AlertConfig.DefaultOkText,
+                OnAction = onOk
             };
         }
 
@@ -258,29 +224,29 @@ namespace Acr.UserDialogs
 
         #region Confirm
 
+        protected virtual ConfirmConfig ToConfirmConfig(string message, Action<bool> onAction, string title, string okText, string cancelText)
+        {
+            return new ConfirmConfig
+            {
+                Message = message,
+                Title = title,
+                OnAction = onAction,
+                OkText = okText ?? ConfirmConfig.DefaultOkText,
+                CancelText = cancelText ?? ConfirmConfig.DefaultCancelText
+            };
+        }
+
+
         public virtual IAlertDialog Confirm(ConfirmConfig config)
         {
-            var dlg = this.CreateDialogFromConfig(config);
-            //dlg.Title = config.Title;
-            //dlg.Message = config.Message;
-            //dlg.IsCancellable = config.IsCancellable;
+            if (config.OnAction == null)
+                throw new ArgumentNullException(NO_ONACTION_SET);
 
-            //dlg.Add(new DialogAction
-            //{
-            //    Label = config.Positive.Label, // ?? ConfirmConfig.DefaultPositive.Label
-            //    Choice = DialogChoice.Positive,
-            //    Tap = x => config.OnAction(true)
-            //});
-            //if (config.Neutral != null)
-            //{
-            //    dlg.Add(new DialogAction
-            //    {
-            //        Label = config.Neutral.Label, // ?? ConfirmConfig.DefaultNeutral.Label
-            //        Choice = DialogChoice.Neutral,
-            //        Tap = x => config.OnAction(false)
-            //    });
-            //}
-            dlg.Show();
+            var dlg = this.CreateDialogFromConfig(config);
+            dlg.IsCancellable = false; // TODO: allow config?
+
+            if (!config.DisableImmediateShow)
+                dlg.Show();
 
             return dlg;
         }
@@ -288,28 +254,12 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Confirm(string message, Action<bool> onAction, string title, string okText, string cancelText)
         {
-            //return this.Confirm(new ConfirmConfig
-            //{
-            //    Title = title,
-            //    Message = message,
-            //    Positive = new DialogAction
-            //    {
-            //        Label = okText,
-            //        Tap = x => onAction(true)
-            //    },
-            //    Neutral = new DialogAction
-            //    {
-            //        Label = cancelText,
-            //        Tap = x => onAction(true)
-            //    }
-            //});
-            return null;
+            return this.Confirm(this.ToConfirmConfig(message, onAction, title, okText, cancelText));
         }
 
 
         public virtual async Task<bool> ConfirmAsync(string message, string title, string okText, string cancelText, CancellationToken? cancelToken = null)
         {
-            // TODO: assert onaction not set
             var tcs = new TaskCompletionSource<bool>();
             var dlg = this.Confirm(message, x => tcs.TrySetResult(x), title, okText, cancelText);
             using (cancelToken?.Register(dlg.Hide))
@@ -321,7 +271,9 @@ namespace Acr.UserDialogs
 
         public virtual async Task<bool> ConfirmAsync(ConfirmConfig config, CancellationToken? cancelToken)
         {
-            // TODO: assert onaction not set
+            if (config.OnAction != null)
+                throw new ArgumentNullException(NO_ONACTION);
+
             var tcs = new TaskCompletionSource<bool>();
             config.OnAction = x => tcs.TrySetResult(x);
             var dlg = this.Confirm(config);
@@ -399,7 +351,53 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Login(LoginConfig config)
         {
-            return null;
+            if (config.OnAction == null)
+                throw new ArgumentNullException(NO_ONACTION_SET);
+
+            var dlg = this.CreateDialogFromConfig(config);
+            dlg.IsCancellable = false; // TODO: configurable?
+
+            var txtLogin = new TextEntry
+            {
+                Placeholder = config.LoginPlaceholder ?? String.Empty,
+                Text = config.LoginValue
+            };
+            var txtPassword = new TextEntry
+            {
+                Placeholder = config.PasswordPlaceholder ?? String.Empty,
+                Keyboard = KeyboardType.Password
+            };
+
+            var loginCmd = new Command(() =>
+            {
+                var creds = new Credentials(txtLogin.Text, txtPassword.Text);
+                config.OnAction(new DialogResult<Credentials>(DialogChoice.Positive, creds));
+            });
+            txtLogin.PropertyChanged += (sender, args) => loginCmd.IsExecuteable = !Extensions.IsAnyEmpty(txtLogin, txtPassword);
+            txtPassword.PropertyChanged += (sender, args) => loginCmd.IsExecuteable = !Extensions.IsAnyEmpty(txtLogin, txtPassword);
+
+            if (config.CancelText != null)
+            {
+                dlg.Add(new DialogAction
+                {
+                    Label = config.CancelText,
+                    Command = new Command(() =>
+                    {
+                        var creds = new Credentials(txtLogin.Text, txtPassword.Text);
+                        config.OnAction(new DialogResult<Credentials>(DialogChoice.Neutral, creds));
+                    })
+                });
+            }
+            dlg.Add(new DialogAction
+            {
+                Label = config.OkText,
+                Command = loginCmd
+            });
+
+            if (!config.DisableImmediateShow)
+                dlg.Show();
+
+            return dlg;
         }
 
 
@@ -434,26 +432,65 @@ namespace Acr.UserDialogs
 
         public virtual IAlertDialog Prompt(PromptConfig config)
         {
-            var dlg = this.CreateDialog();
-            dlg.Title = config.Title;
-            dlg.Message = config.Message;
-            dlg.IsCancellable = config.IsCancellable;
+            if (config.OnAction == null)
+                throw new ArgumentNullException(NO_ONACTION_SET);
 
-            dlg.Dismissed = () => { };
+            var dlg = this.CreateDialogFromConfig(config);
+            var txt = new TextEntry
+            {
+                Placeholder = config.Placeholder ?? String.Empty,
+                Text = config.Text,
+                MaxLength = config.MaxLength,
+                Keyboard = config.InputType
+            };
+            var acceptCmd = new Command(() =>
+                config.OnAction(new DialogResult<string>(DialogChoice.Positive, txt.Text))
+            );
 
-            //if (config.Positive != null)
-            //{
+            dlg.Add(new DialogAction
+            {
+                Label = config.OkText,
+                Command = acceptCmd
+            });
+            if (config.CancelText != null)
+            {
+                dlg.Add(new DialogAction
+                {
+                    Label = config.CancelText,
+                    Command = new Command(() =>
+                        config.OnAction(new DialogResult<string>(DialogChoice.Neutral, txt.Text))
+                    )
+                });
+            }
+            if (config.OnTextChanged != null)
+            {
+                var changeArgs = new PromptTextChangedArgs
+                {
+                    IsValid = true,
+                    Value = txt.Text
+                };
+                config.OnTextChanged(changeArgs); // fire first time
+                acceptCmd.IsExecuteable = changeArgs.IsValid;
 
-            //}
-            //if (config.Neutral != null)
-            //{
+                txt.PropertyChanged += (sender, args) =>
+                {
+                    if (nameof(txt.Text) != args.PropertyName)
+                        return;
 
-            //}
-            //if (config.Negative != null)
-            //{
-
-            //}
+                    changeArgs.Value = txt.Text;
+                    config.OnTextChanged(changeArgs);
+                    acceptCmd.IsExecuteable = changeArgs.IsValid;
+                    if (!txt.Equals(changeArgs.Value))
+                        txt.Text = changeArgs.Value;
+                };
+            }
+            //dlg.Dismissed = () => { };
             // TODO: 3 buttons
+
+            if (!config.DisableImmediateShow)
+                dlg.Show();
+
+
             return dlg;
         }
 

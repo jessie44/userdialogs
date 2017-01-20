@@ -7,7 +7,7 @@ namespace Acr.UserDialogs
 {
     public interface IAlertDialog : IDisposable
     {
-        // TODO: IsShown, AndroidStyleId
+        // TODO: AndroidStyleId, AndroidWindowState
 
         string Title { get; set; }
         string Message { get; set; }
@@ -31,6 +31,6 @@ namespace Acr.UserDialogs
         void Hide();
 
         // TODO: what about outside cancel?
-        Action Dismissed { get; set; }
+        event EventHandler Dismissed;
     }
 }
