@@ -61,9 +61,11 @@ Supported Platforms
 7.0.0
 This release does contain breaking changes!
 EVERYTHING is netstandard!
-[feature] don't like the prompt/login/alerts now, create your own, add as many text entries as you want
+[feature] don't like the prompt/login/alerts now, create your own, add as many text entries and buttons as you want using UserDialogs.CreateAlertDialog()
 [feature] STYLING!!
 [feature] Ok/Cancel is gone, welcome Postive, Neutral, and Negative buttons for alert, login, and prompt
+[feature] Snackbars and toasts now two different things
+[feature] Snackbars and toasts both support screen position (top or bottom)
 [feature][ios] calendar, toasts, and snackbars now use material controls
 [breaking] Confirm is now just a wrapper signature around alert
 [fix][droid] ActionSheetAsync is fixed for dismiss
