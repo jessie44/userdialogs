@@ -419,6 +419,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       }

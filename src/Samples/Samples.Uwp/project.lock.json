@@ -2381,6 +2381,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -2396,12 +2397,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -4841,6 +4843,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -4856,12 +4859,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -7340,6 +7344,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -7355,12 +7360,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -9809,6 +9815,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -9824,12 +9831,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -12317,6 +12325,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -12332,12 +12341,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -14786,6 +14796,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -14801,12 +14812,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
@@ -17294,6 +17306,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "NETStandard.Library": "1.6.1",
           "Splat": "2.0.0"
         }
       },
@@ -17309,12 +17322,13 @@
       },
       "Samples/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "Acr.UserDialogs": "1.0.0",
           "Acr.UserDialogs.Interface": "1.0.0",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-          "NETStandard.Library": "1.6.1",
+          "NETStandard.Library": "1.6.0",
+          "Splat": "2.0.0",
           "Xamarin.Forms": "2.3.3.180"
         }
       }
