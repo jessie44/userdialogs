@@ -21,7 +21,7 @@ namespace Acr.UserDialogs
         {
             var member = expression.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException("");
+                throw new ArgumentException("Member not found");
 
             this.OnPropertyChanged(member.Member.Name);
         }

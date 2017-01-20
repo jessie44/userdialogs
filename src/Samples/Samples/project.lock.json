@@ -4190,12 +4190,9 @@
     },
     "dependencies": {
       "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+      "NETStandard.Library": "1.6.1",
       "Splat": "2.0.0",
-      "Xamarin.Forms": "2.3.3.180",
-      "NETStandard.Library": {
-        "target": "Package",
-        "version": "[1.6.1, )"
-      }
+      "Xamarin.Forms": "2.3.3.180"
     },
     "frameworks": {
       "netstandard1.3": {

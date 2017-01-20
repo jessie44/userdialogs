@@ -79,7 +79,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppCompat\AcrDialogFragment.cs" />
     <Compile Include="AppCompat\AppCompatSnackbar.cs" />
     <Compile Include="Internals\Toast.cs" />
     <Compile Include="EditTextBuilder.cs" />

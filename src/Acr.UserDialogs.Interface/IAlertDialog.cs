@@ -26,8 +26,9 @@ namespace Acr.UserDialogs
         IAlertDialog Add(TextEntry instance);
         IAlertDialog Add(DialogAction action);
 
+        bool IsVisible { get; }
         void Show();
-        void Dismiss();
+        void Hide();
 
         // TODO: what about outside cancel?
         Action Dismissed { get; set; }

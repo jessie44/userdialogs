@@ -18,12 +18,12 @@ namespace Acr.UserDialogs
 
         ~AbstractAlertDialog()
         {
-            Dispose(false);
+            this.Dispose(false);
         }
 
 
         public abstract void Show();
-        public abstract void Dismiss();
+        public abstract void Hide();
 
         protected List<TextEntry> InternalTextEntries { get; } = new List<TextEntry>();
         protected List<DialogAction> InternalActions { get; } = new List<DialogAction>();
@@ -34,6 +34,7 @@ namespace Acr.UserDialogs
         public string Message { get; set; }
         public string Title { get; set; }
         public bool IsCancellable { get; set; }
+        public bool IsVisible { get; protected set; }
         public DialogAction Positive { get; set; }
         public DialogAction Neutral { get; set; }
         public DialogAction Negative { get; set; }

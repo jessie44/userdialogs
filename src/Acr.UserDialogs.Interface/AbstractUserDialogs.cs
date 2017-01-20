@@ -164,7 +164,7 @@ namespace Acr.UserDialogs
         }
 
 
-        public virtual Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons)
+        public virtual async Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons)
         {
             var tcs = new TaskCompletionSource<string>();
             var cfg = new ActionSheetConfig();
@@ -195,7 +195,7 @@ namespace Acr.UserDialogs
             var disp = this.ActionSheet(cfg);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return tcs.Task;
+                return await tcs.Task;
             }
         }
 
@@ -206,20 +206,32 @@ namespace Acr.UserDialogs
         public virtual IAlertDialog Alert(AlertConfig config)
         {
             var dlg = this.CreateDialogFromConfig(config);
-
+            dlg.Show();
             return dlg;
         }
 
 
-        public virtual IAlertDialog Alert(string message, string title, string okText, Action<DialogChoice> action)
+        protected virtual AlertConfig ToAlertConfig(string message, string title, string okText, Action onOk)
         {
-            //return this.Alert(new AlertConfig()
-            //    .SetMessage(message)
-            //    .SetTitle(title)
-            //    .SetText(DialogChoice.Positive, okText ?? AlertConfig.DefaultPositive.Text)
-            //);
-            return null;
+            return new AlertConfig
+            {
+                Title = title,
+                Message = message,
+                OkButton = new DialogAction
+                {
+                    // TODO: should be able to set iOS style (destructive, default, neutral)
+                    Label = okText, // default text if null (ie. AlertConfig.DefaultPositive.Text)
+                    Command = new Command(() => onOk?.Invoke())
+                }
+            };
         }
+
+
+        public virtual IAlertDialog Alert(string message, string title, string okText, Action onOk)
+        {
+            return this.Alert(this.ToAlertConfig(message, title, okText, onOk));
+        }
+
 
         public virtual async Task AlertAsync(AlertConfig config, CancellationToken? cancelToken = null)
         {
@@ -239,13 +251,7 @@ namespace Acr.UserDialogs
 
         public virtual Task AlertAsync(string message, string title, string okText, CancellationToken? cancelToken = null)
         {
-            //return this.AlertAsync(new AlertConfig()
-            //    .SetMessage(message)
-            //    .SetTitle(title)
-            //    .SetText(DialogChoice.Positive, okText ?? AlertConfig.DefaultPositive.Text),
-            //    cancelToken
-            //);
-            return null;
+            return this.AlertAsync(this.ToAlertConfig(message, title, okText, null), cancelToken);
         }
 
         #endregion
@@ -301,19 +307,19 @@ namespace Acr.UserDialogs
         }
 
 
-        public virtual Task<bool> ConfirmAsync(string message, string title, string okText, string cancelText, CancellationToken? cancelToken = null)
+        public virtual async Task<bool> ConfirmAsync(string message, string title, string okText, string cancelText, CancellationToken? cancelToken = null)
         {
             // TODO: assert onaction not set
             var tcs = new TaskCompletionSource<bool>();
             var dlg = this.Confirm(message, x => tcs.TrySetResult(x), title, okText, cancelText);
-            using (cancelToken?.Register(dlg.Dismiss))
+            using (cancelToken?.Register(dlg.Hide))
             {
-                return tcs.Task;
+                return await tcs.Task;
             }
         }
 
 
-        public virtual Task<bool> ConfirmAsync(ConfirmConfig config, CancellationToken? cancelToken)
+        public virtual async Task<bool> ConfirmAsync(ConfirmConfig config, CancellationToken? cancelToken)
         {
             // TODO: assert onaction not set
             var tcs = new TaskCompletionSource<bool>();
@@ -322,7 +328,7 @@ namespace Acr.UserDialogs
 
             using (cancelToken?.Register(() => Cancel(dlg, tcs)))
             {
-                return tcs.Task;
+                return await tcs.Task;
             }
         }
 
@@ -330,7 +336,7 @@ namespace Acr.UserDialogs
 
         #region Date/Time
 
-        public virtual Task<DialogResult<DateTime>> DatePromptAsync(DatePromptConfig config, CancellationToken? cancelToken = null)
+        public virtual async Task<DialogResult<DateTime>> DatePromptAsync(DatePromptConfig config, CancellationToken? cancelToken = null)
         {
             if (config.OnAction != null)
                 throw new ArgumentException(NO_ONACTION);
@@ -341,7 +347,7 @@ namespace Acr.UserDialogs
             var disp = this.DatePrompt(config);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return tcs.Task;
+                return await tcs.Task;
             }
         }
 
@@ -359,7 +365,7 @@ namespace Acr.UserDialogs
         }
 
 
-        public virtual Task<DialogResult<TimeSpan>> TimePromptAsync(TimePromptConfig config, CancellationToken? cancelToken = null)
+        public virtual async Task<DialogResult<TimeSpan>> TimePromptAsync(TimePromptConfig config, CancellationToken? cancelToken = null)
         {
             if (config.OnAction != null)
                 throw new ArgumentException(NO_ONACTION);
@@ -370,7 +376,7 @@ namespace Acr.UserDialogs
             var disp = this.TimePrompt(config);
             using (cancelToken?.Register(() => Cancel(disp, tcs)))
             {
-                return tcs.Task;
+                return await tcs.Task;
             }
         }
 

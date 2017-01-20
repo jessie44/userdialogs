@@ -11,7 +11,7 @@ namespace Acr.UserDialogs
     {
         IAlertDialog CreateDialog();
 
-        IAlertDialog Alert(string message, string title = null, string okText = null, Action<DialogChoice> action = null);
+        IAlertDialog Alert(string message, string title = null, string okText = null, Action onOk = null);
         IAlertDialog Alert(AlertConfig config);
         Task AlertAsync(string message, string title = null, string okText = null, CancellationToken? cancelToken = null);
         Task AlertAsync(AlertConfig config, CancellationToken? cancelToken = null);
