@@ -12,7 +12,6 @@ using Android.Text.Style;
 using AndroidHUD;
 using Splat;
 
-
 namespace Acr.UserDialogs
 {
     public class UserDialogsImpl : AbstractUserDialogs
@@ -20,12 +19,10 @@ namespace Acr.UserDialogs
         public static string FragmentTag { get; set; } = "UserDialogs";
         protected internal Func<Activity> TopActivityFunc { get; set; }
 
-
         public UserDialogsImpl(Func<Activity> getTopActivity)
         {
             this.TopActivityFunc = getTopActivity;
         }
-
 
         #region Alert Dialogs
 
@@ -40,7 +37,6 @@ namespace Acr.UserDialogs
 
             return this.Show(activity, () => new AlertBuilder().Build(activity, config));
         }
-
 
         public override IDisposable ActionSheet(ActionSheetConfig config)
         {
@@ -59,7 +55,6 @@ namespace Acr.UserDialogs
             return this.Show(activity, () => new ActionSheetBuilder().Build(activity, config));
         }
 
-
         public override IDisposable Confirm(ConfirmConfig config)
         {
             var activity = this.TopActivityFunc();
@@ -71,7 +66,6 @@ namespace Acr.UserDialogs
 
             return this.Show(activity, () => new ConfirmBuilder().Build(activity, config));
         }
-
 
         public override IDisposable DatePrompt(DatePromptConfig config)
         {
@@ -85,7 +79,6 @@ namespace Acr.UserDialogs
             return this.Show(activity, () => DatePromptBuilder.Build(activity, config));
         }
 
-
         public override IDisposable Login(LoginConfig config)
         {
             var activity = this.TopActivityFunc();
@@ -97,7 +90,6 @@ namespace Acr.UserDialogs
 
             return this.Show(activity, () => new LoginBuilder().Build(activity, config));
         }
-
 
         public override IDisposable Prompt(PromptConfig config)
         {
@@ -111,6 +103,16 @@ namespace Acr.UserDialogs
             return this.Show(activity, () => new PromptBuilder().Build(activity, config));
         }
 
+        public override IDisposable PickerPrompt(PickerPromptConfig config)
+        {
+            var activity = this.TopActivityFunc();
+            if (activity is AppCompatActivity)
+                return this.ShowDialog<PickerAppCompatDialogFragment, PickerPromptConfig>((AppCompatActivity)activity, config);
+            if (activity is FragmentActivity)
+                return this.ShowDialog<PickerDialogFragment, PickerPromptConfig>((FragmentActivity)activity, config);
+
+            return this.Show(activity, () => new PickerBuilder().Build(activity, config));
+        }
 
         public override IDisposable TimePrompt(TimePromptConfig config)
         {
@@ -124,7 +126,7 @@ namespace Acr.UserDialogs
             return this.Show(activity, () => TimePromptBuilder.Build(activity, config));
         }
 
-        #endregion
+        #endregion Alert Dialogs
 
         #region Images
 
@@ -136,7 +138,6 @@ namespace Acr.UserDialogs
             );
         }
 
-
         public override void ShowSuccess(string message, int timeoutMillis)
         {
             var activity = this.TopActivityFunc();
@@ -144,7 +145,6 @@ namespace Acr.UserDialogs
                 AndHUD.Shared.ShowSuccess(activity, message, timeout: TimeSpan.FromMilliseconds(timeoutMillis))
             );
         }
-
 
         public override void ShowError(string message, int timeoutMillis)
         {
@@ -154,7 +154,7 @@ namespace Acr.UserDialogs
             );
         }
 
-        #endregion
+        #endregion Images
 
         #region Toasts
 
@@ -168,7 +168,6 @@ namespace Acr.UserDialogs
 
             return this.ToastAppCompat(compat, cfg);
         }
-
 
         protected virtual IDisposable ToastAppCompat(AppCompatActivity activity, ToastConfig cfg)
         {
@@ -230,7 +229,6 @@ namespace Acr.UserDialogs
             });
         }
 
-
         protected virtual ISpanned GetSnackbarText(ToastConfig cfg)
         {
             var sb = new SpannableStringBuilder();
@@ -262,7 +260,6 @@ namespace Acr.UserDialogs
             return sb;
         }
 
-
         protected virtual string ToHex(System.Drawing.Color color)
         {
             var red = (int)(color.R * 255);
@@ -273,7 +270,6 @@ namespace Acr.UserDialogs
             var hex = String.Format($"#{red:X2}{green:X2}{blue:X2}");
             return hex;
         }
-
 
         protected virtual IDisposable ToastFallback(Activity activity, ToastConfig cfg)
         {
@@ -301,7 +297,7 @@ namespace Acr.UserDialogs
             });
         }
 
-        #endregion
+        #endregion Toasts
 
         #region Internals
 
@@ -309,7 +305,6 @@ namespace Acr.UserDialogs
         {
             var activity = this.TopActivityFunc();
             var dialog = new ProgressDialog(config, activity);
-
 
             //if (activity != null)
             //{
@@ -324,7 +319,6 @@ namespace Acr.UserDialogs
             return dialog;
         }
 
-
         protected virtual IDisposable Show(Activity activity, Func<Dialog> dialogBuilder)
         {
             Dialog dialog = null;
@@ -338,7 +332,6 @@ namespace Acr.UserDialogs
             );
         }
 
-
         protected virtual IDisposable ShowDialog<TFragment, TConfig>(FragmentActivity activity, TConfig config) where TFragment : AbstractDialogFragment<TConfig> where TConfig : class, new()
         {
             var frag = (TFragment)Activator.CreateInstance(typeof(TFragment));
@@ -349,7 +342,6 @@ namespace Acr.UserDialogs
                 activity.RunOnUiThread(frag.Dismiss)
             );
         }
-
 
         protected virtual IDisposable ShowDialog<TFragment, TConfig>(AppCompatActivity activity, TConfig config) where TFragment : AbstractAppCompatDialogFragment<TConfig> where TConfig : class, new()
         {
@@ -364,6 +356,6 @@ namespace Acr.UserDialogs
             );
         }
 
-        #endregion
+        #endregion Internals
     }
 }

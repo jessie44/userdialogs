@@ -10,7 +10,6 @@ using Android.Widget;
 using AlertDialog = Android.App.AlertDialog;
 using AppCompatAlertDialog = Android.Support.V7.App.AlertDialog;
 
-
 namespace Acr.UserDialogs.Builders
 {
     public class PromptBuilder : IAlertDialogBuilder<PromptConfig>
@@ -29,7 +28,7 @@ namespace Acr.UserDialogs.Builders
             }
 
             if (config.MaxLength != null)
-                txt.SetFilters(new [] { new InputFilterLengthFilter(config.MaxLength.Value) });
+                txt.SetFilters(new[] { new InputFilterLengthFilter(config.MaxLength.Value) });
 
             SetInputType(txt, config.InputType);
 
@@ -54,8 +53,7 @@ namespace Acr.UserDialogs.Builders
             return dialog;
         }
 
-
-        public Dialog Build(AppCompatActivity activity, PromptConfig config)
+        public AppCompatAlertDialog Build(AppCompatActivity activity, PromptConfig config)
         {
             var txt = new EditText(activity)
             {
@@ -93,7 +91,6 @@ namespace Acr.UserDialogs.Builders
             return dialog;
         }
 
-
         protected virtual void HookTextChanged(Dialog dialog, EditText txt, PromptConfig config)
         {
             if (config.OnTextChanged == null)
@@ -127,18 +124,16 @@ namespace Acr.UserDialogs.Builders
             };
         }
 
-
         //protected virtual void ChangeImeOption(PromptConfig config, EditText txt, bool enable)
         //{
-            //var action = enable ? ImeAction.Done : ImeAction.None;
-            //if (txt.ImeOptions == action)
-            //    return;
+        //var action = enable ? ImeAction.Done : ImeAction.None;
+        //if (txt.ImeOptions == action)
+        //    return;
 
-            //txt.ImeOptions = action;
-            //var input = (InputMethodManager)Application.Context.GetSystemService(Context.InputMethodService);
-            //input.RestartInput(txt);
+        //txt.ImeOptions = action;
+        //var input = (InputMethodManager)Application.Context.GetSystemService(Context.InputMethodService);
+        //input.RestartInput(txt);
         //}
-
 
         protected virtual Button GetButton(Dialog dialog, int buttonId)
         {
@@ -152,7 +147,6 @@ namespace Acr.UserDialogs.Builders
 
             throw new ArgumentException("Invalid dialog type.  This exception should never be seen. " + dialog.GetType());
         }
-
 
         public static void SetInputType(TextView txt, InputType inputType)
         {

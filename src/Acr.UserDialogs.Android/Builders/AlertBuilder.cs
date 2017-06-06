@@ -4,7 +4,6 @@ using Android.Support.V7.App;
 using AlertDialog = Android.App.AlertDialog;
 using AppCompatAlertDialog = Android.Support.V7.App.AlertDialog;
 
-
 namespace Acr.UserDialogs.Builders
 {
     public class AlertBuilder : IAlertDialogBuilder<AlertConfig>
@@ -25,8 +24,7 @@ namespace Acr.UserDialogs.Builders
                 .Create();
         }
 
-
-        public Dialog Build(AppCompatActivity activity, AlertConfig config)
+        public AppCompatAlertDialog Build(AppCompatActivity activity, AlertConfig config)
         {
             return new AppCompatAlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
                 .SetCancelable(false)

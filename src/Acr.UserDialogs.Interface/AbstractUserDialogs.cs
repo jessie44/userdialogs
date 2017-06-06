@@ -3,27 +3,37 @@ using System.Threading;
 using System.Threading.Tasks;
 using Splat;
 
-
 namespace Acr.UserDialogs
 {
-
     public abstract class AbstractUserDialogs : IUserDialogs
     {
-        const string NO_ONACTION = "OnAction should not be set as async will not use it";
+        private const string NO_ONACTION = "OnAction should not be set as async will not use it";
 
         public abstract IDisposable Alert(AlertConfig config);
-        public abstract IDisposable ActionSheet(ActionSheetConfig config);
-        public abstract IDisposable Confirm(ConfirmConfig config);
-        public abstract IDisposable DatePrompt(DatePromptConfig config);
-        public abstract IDisposable TimePrompt(TimePromptConfig config);
-        public abstract IDisposable Login(LoginConfig config);
-        public abstract IDisposable Prompt(PromptConfig config);
-        public abstract void ShowImage(IBitmap image, string message, int timeoutMillis);
-        public abstract void ShowError(string message, int timeoutMillis);
-        public abstract void ShowSuccess(string message, int timeoutMillis);
-        public abstract IDisposable Toast(ToastConfig config);
-        protected abstract IProgressDialog CreateDialogInstance(ProgressDialogConfig config);
 
+        public abstract IDisposable ActionSheet(ActionSheetConfig config);
+
+        public abstract IDisposable Confirm(ConfirmConfig config);
+
+        public abstract IDisposable DatePrompt(DatePromptConfig config);
+
+        public abstract IDisposable TimePrompt(TimePromptConfig config);
+
+        public abstract IDisposable Login(LoginConfig config);
+
+        public abstract IDisposable Prompt(PromptConfig config);
+
+        public abstract IDisposable PickerPrompt(PickerPromptConfig config);
+
+        public abstract void ShowImage(IBitmap image, string message, int timeoutMillis);
+
+        public abstract void ShowError(string message, int timeoutMillis);
+
+        public abstract void ShowSuccess(string message, int timeoutMillis);
+
+        public abstract IDisposable Toast(ToastConfig config);
+
+        protected abstract IProgressDialog CreateDialogInstance(ProgressDialogConfig config);
 
         public virtual async Task<string> ActionSheetAsync(string title, string cancel, string destructive, CancellationToken? cancelToken = null, params string[] buttons)
         {
@@ -50,7 +60,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual IDisposable Alert(string message, string title, string okText)
         {
             return this.Alert(new AlertConfig
@@ -61,8 +70,8 @@ namespace Acr.UserDialogs
             });
         }
 
+        private IProgressDialog loading;
 
-        IProgressDialog loading;
         public virtual void ShowLoading(string title, MaskType? maskType)
         {
             if (this.loading != null)
@@ -71,13 +80,11 @@ namespace Acr.UserDialogs
             this.loading = this.Loading(title, null, null, true, maskType);
         }
 
-
         public virtual void HideLoading()
         {
             this.loading?.Dispose();
             this.loading = null;
         }
-
 
         public virtual IProgressDialog Loading(string title, Action onCancel, string cancelText, bool show, MaskType? maskType)
         {
@@ -92,7 +99,6 @@ namespace Acr.UserDialogs
             });
         }
 
-
         public virtual IProgressDialog Progress(string title, Action onCancel, string cancelText, bool show, MaskType? maskType)
         {
             return this.Progress(new ProgressDialogConfig
@@ -106,7 +112,6 @@ namespace Acr.UserDialogs
             });
         }
 
-
         public virtual IProgressDialog Progress(ProgressDialogConfig config)
         {
             var dlg = this.CreateDialogInstance(config);
@@ -117,7 +122,6 @@ namespace Acr.UserDialogs
 
             return dlg;
         }
-
 
         public virtual async Task AlertAsync(AlertConfig config, CancellationToken? cancelToken = null)
         {
@@ -134,7 +138,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task AlertAsync(string message, string title, string okText, CancellationToken? cancelToken = null)
         {
             return this.AlertAsync(new AlertConfig
@@ -144,7 +147,6 @@ namespace Acr.UserDialogs
                 OkText = okText ?? AlertConfig.DefaultOkText
             }, cancelToken);
         }
-
 
         public virtual async Task<bool> ConfirmAsync(ConfirmConfig config, CancellationToken? cancelToken = null)
         {
@@ -161,7 +163,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task<bool> ConfirmAsync(string message, string title, string okText, string cancelText, CancellationToken? cancelToken = null)
         {
             return this.ConfirmAsync(new ConfirmConfig
@@ -172,7 +173,6 @@ namespace Acr.UserDialogs
                 OkText = okText ?? ConfirmConfig.DefaultOkText
             }, cancelToken);
         }
-
 
         public virtual async Task<DatePromptResult> DatePromptAsync(DatePromptConfig config, CancellationToken? cancelToken = null)
         {
@@ -189,7 +189,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task<DatePromptResult> DatePromptAsync(string title, DateTime? selectedDate, CancellationToken? cancelToken = null)
         {
             return this.DatePromptAsync(
@@ -201,7 +200,6 @@ namespace Acr.UserDialogs
                 cancelToken
             );
         }
-
 
         public virtual async Task<TimePromptResult> TimePromptAsync(TimePromptConfig config, CancellationToken? cancelToken = null)
         {
@@ -218,7 +216,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task<TimePromptResult> TimePromptAsync(string title, TimeSpan? selectedTime, CancellationToken? cancelToken = null)
         {
             return this.TimePromptAsync(
@@ -230,7 +227,6 @@ namespace Acr.UserDialogs
                 cancelToken
             );
         }
-
 
         public virtual async Task<LoginResult> LoginAsync(LoginConfig config, CancellationToken? cancelToken = null)
         {
@@ -247,7 +243,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task<LoginResult> LoginAsync(string title, string message, CancellationToken? cancelToken = null)
         {
             return this.LoginAsync(new LoginConfig
@@ -256,7 +251,6 @@ namespace Acr.UserDialogs
                 Message = message
             }, cancelToken);
         }
-
 
         public virtual async Task<PromptResult> PromptAsync(PromptConfig config, CancellationToken? cancelToken = null)
         {
@@ -273,7 +267,6 @@ namespace Acr.UserDialogs
             }
         }
 
-
         public virtual Task<PromptResult> PromptAsync(string message, string title, string okText, string cancelText, string placeholder, InputType inputType, CancellationToken? cancelToken = null)
         {
             return this.PromptAsync(new PromptConfig
@@ -287,7 +280,6 @@ namespace Acr.UserDialogs
             }, cancelToken);
         }
 
-
         public virtual IDisposable Toast(string message, TimeSpan? dismissTimer)
         {
             return this.Toast(new ToastConfig(message)
@@ -296,11 +288,26 @@ namespace Acr.UserDialogs
             });
         }
 
-
-        static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
+        private static void Cancel<TResult>(IDisposable disp, TaskCompletionSource<TResult> tcs)
         {
             disp.Dispose();
             tcs.TrySetCanceled();
+        }
+
+        public Task<PickerPromptResult> PickerPromptAsync(PickerPromptConfig config,
+            CancellationToken? cancelToken = default(CancellationToken?))
+        {
+            if (config.OnAction != null)
+                throw new ArgumentException(NO_ONACTION);
+            var tcs = new TaskCompletionSource<PickerPromptResult>();
+            config.OnAction = x => tcs.TrySetResult(x);
+            var disp = this.PickerPrompt(config);
+            cancelToken?.Register(() =>
+            {
+                disp.Dispose();
+                tcs.TrySetCanceled();
+            });
+            return tcs.Task;
         }
     }
 }

@@ -5,7 +5,6 @@ using Android.Support.V7.App;
 using AlertDialog = Android.App.AlertDialog;
 using AppCompatAlertDialog = Android.Support.V7.App.AlertDialog;
 
-
 namespace Acr.UserDialogs.Builders
 {
     public class ActionSheetBuilder : IAlertDialogBuilder<ActionSheetConfig>
@@ -44,8 +43,7 @@ namespace Acr.UserDialogs.Builders
             return dlg.Create();
         }
 
-
-        public Dialog Build(AppCompatActivity activity, ActionSheetConfig config)
+        public AppCompatAlertDialog Build(AppCompatActivity activity, ActionSheetConfig config)
         {
             var dlg = new AppCompatAlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
                 .SetTitle(config.Title);
@@ -78,7 +76,6 @@ namespace Acr.UserDialogs.Builders
 
             return dlg.Create();
         }
-
 
         //protected virtual View GetCustomTitle(Activity activity, ActionSheetConfig config)
         //{

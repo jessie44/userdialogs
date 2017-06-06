@@ -9,24 +9,20 @@ using BigTed;
 using Splat;
 using TTG;
 
-
 namespace Acr.UserDialogs
 {
     public class UserDialogsImpl : AbstractUserDialogs
     {
-        readonly Func<UIViewController> viewControllerFunc;
-
+        private readonly Func<UIViewController> viewControllerFunc;
 
         public UserDialogsImpl() : this(() => UIApplication.SharedApplication.GetTopViewController())
         {
         }
 
-
         public UserDialogsImpl(Func<UIViewController> viewControllerFunc)
         {
             this.viewControllerFunc = viewControllerFunc;
         }
-
 
         public override IDisposable Alert(AlertConfig config) => this.Present(() =>
         {
@@ -35,9 +31,7 @@ namespace Acr.UserDialogs
             return alert;
         });
 
-
         public override IDisposable ActionSheet(ActionSheetConfig config) => this.Present(() => this.CreateNativeActionSheet(config));
-
 
         public override IDisposable Confirm(ConfirmConfig config) => this.Present(() =>
         {
@@ -46,7 +40,6 @@ namespace Acr.UserDialogs
             dlg.AddAction(UIAlertAction.Create(config.OkText, UIAlertActionStyle.Default, x => config.OnAction?.Invoke(true)));
             return dlg;
         });
-
 
         public override IDisposable DatePrompt(DatePromptConfig config)
         {
@@ -68,13 +61,12 @@ namespace Acr.UserDialogs
             return this.Present(picker);
         }
 
-
         public override IDisposable TimePrompt(TimePromptConfig config)
         {
             var picker = new AI.AIDatePickerController
             {
                 Mode = UIDatePickerMode.Time,
-				SelectedDateTime = config.SelectedTime != null ? DateTime.Today.Add ((TimeSpan)config.SelectedTime) : DateTime.Now,
+                SelectedDateTime = config.SelectedTime != null ? DateTime.Today.Add((TimeSpan)config.SelectedTime) : DateTime.Now,
                 MinuteInterval = config.MinuteInterval,
                 OkText = config.OkText,
                 CancelText = config.CancelText,
@@ -84,7 +76,6 @@ namespace Acr.UserDialogs
             };
             return this.Present(picker);
         }
-
 
         public override IDisposable Login(LoginConfig config) => this.Present(() =>
         {
@@ -108,7 +99,6 @@ namespace Acr.UserDialogs
             });
             return dlg;
         });
-
 
         public override IDisposable Prompt(PromptConfig config) => this.Present(() =>
         {
@@ -154,8 +144,12 @@ namespace Acr.UserDialogs
             return dlg;
         });
 
+        public override IDisposable PickerPrompt(PickerPromptConfig config)
+        {
+            throw new NotImplementedException();
+        }
 
-        static void ValidatePrompt(UITextField txt, UIAlertAction btn, PromptConfig config)
+        private static void ValidatePrompt(UITextField txt, UIAlertAction btn, PromptConfig config)
         {
             var args = new PromptTextChangedArgs { Value = txt.Text };
             config.OnTextChanged(args);
@@ -164,20 +158,17 @@ namespace Acr.UserDialogs
                 txt.Text = args.Value;
         }
 
-
         public override void ShowImage(IBitmap image, string message, int timeoutMillis)
             => BTProgressHUD.ShowImage(image.ToNative(), message, timeoutMillis);
-
 
         public override void ShowError(string message, int timeoutMillis)
             => BTProgressHUD.ShowErrorWithStatus(message, timeoutMillis);
 
-
         public override void ShowSuccess(string message, int timeoutMillis)
             => BTProgressHUD.ShowSuccessWithStatus(message, timeoutMillis);
 
+        private IDisposable currentToast;
 
-        IDisposable currentToast;
         public override IDisposable Toast(ToastConfig cfg)
         {
             this.currentToast?.Dispose();
@@ -201,7 +192,7 @@ namespace Acr.UserDialogs
 
                 if (cfg.MessageTextColor != null)
                     snackbar.MessageLabel.TextColor = cfg.MessageTextColor.Value.ToNative();
-                    //snackbar.MessageTextColor = cfg.MessageTextColor.Value.ToNative();
+                //snackbar.MessageTextColor = cfg.MessageTextColor.Value.ToNative();
 
                 //if (cfg.Position != null)
                 //    snackbar.LocationType = cfg.Position == ToastPosition.Top
@@ -229,7 +220,6 @@ namespace Acr.UserDialogs
             });
             return this.currentToast;
         }
-
 
         #region Internals
 
@@ -264,9 +254,7 @@ namespace Acr.UserDialogs
             controller.AddAction(alertAction);
         }
 
-
         protected override IProgressDialog CreateDialogInstance(ProgressDialogConfig config) => new ProgressDialog(config);
-
 
         protected virtual IDisposable Present(Func<UIAlertController> alertFunc)
         {
@@ -298,7 +286,6 @@ namespace Acr.UserDialogs
             });
         }
 
-
         protected virtual IDisposable Present(UIViewController controller)
         {
             var app = UIApplication.SharedApplication;
@@ -314,7 +301,6 @@ namespace Acr.UserDialogs
                 catch { }
             });
         }
-
 
         protected virtual void SetInputType(UITextField txt, InputType inputType)
         {
@@ -354,6 +340,6 @@ namespace Acr.UserDialogs
             }
         }
 
-        #endregion
+        #endregion Internals
     }
 }

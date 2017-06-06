@@ -7,7 +7,6 @@ using Android.Widget;
 using AlertDialog = Android.App.AlertDialog;
 using AppCompatAlertDialog = Android.Support.V7.App.AlertDialog;
 
-
 namespace Acr.UserDialogs.Builders
 {
     public class LoginBuilder : IAlertDialogBuilder<LoginConfig>
@@ -55,8 +54,7 @@ namespace Acr.UserDialogs.Builders
                 .Create();
         }
 
-
-        public Dialog Build(AppCompatActivity activity, LoginConfig config)
+        public AppCompatAlertDialog Build(AppCompatActivity activity, LoginConfig config)
         {
             var txtUser = new EditText(activity)
             {

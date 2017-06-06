@@ -4,7 +4,6 @@ using Android.Support.V7.App;
 using AlertDialog = Android.App.AlertDialog;
 using AppCompatAlertDialog = Android.Support.V7.App.AlertDialog;
 
-
 namespace Acr.UserDialogs.Builders
 {
     public class ConfirmBuilder : IAlertDialogBuilder<ConfirmConfig>
@@ -20,8 +19,7 @@ namespace Acr.UserDialogs.Builders
                 .Create();
         }
 
-
-        public Dialog Build(AppCompatActivity activity, ConfirmConfig config)
+        public AppCompatAlertDialog Build(AppCompatActivity activity, ConfirmConfig config)
         {
             return new AppCompatAlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
                 .SetCancelable(false)
